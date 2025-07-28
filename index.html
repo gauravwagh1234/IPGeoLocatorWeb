@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <title>IP Geo Locator</title>
+  <style>
+    /* Reset */
+    * {
+      box-sizing: border-box;
+    }
+    body, html {
+      margin: 0; padding: 0;
+      height: 100%;
+      background: #f5f7fa;
+      font-family: 'Times New Roman', Times, serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: #202a44;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      padding: 1rem;
+      min-height: 100vh;
+    }
+
+    .card {
+      background: #ffffff;
+      width: 100%;
+      max-width: 360px;
+      border-radius: 16px;
+      box-shadow: 0 8px 20px rgba(32, 42, 68, 0.12);
+      padding: 1.5rem 1.5rem 2rem;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      box-sizing: border-box;
+      /* smooth entrance */
+      transition: box-shadow 0.3s ease;
+    }
+    .card:focus-within {
+      box-shadow: 0 10px 24px rgba(32, 42, 68, 0.18);
+      outline: none;
+    }
+
+    h1 {
+      font-weight: 700;
+      font-size: 1.7rem;
+      margin: 0 0 1rem;
+      letter-spacing: 0.05em;
+      color: #141a38;
+      user-select: none;
+      font-family: 'Times New Roman', Times, serif;
+    }
+
+    input[type="text"] {
+      font-size: 1rem;
+      padding: 0.65rem 1rem;
+      border-radius: 28px;
+      border: 2px solid #d1d9e6;
+      outline-offset: 2px;
+      outline-color: transparent;
+      transition: border-color 0.3s ease, box-shadow 0.3s ease;
+      width: 100%;
+      color: #2b3448;
+      font-weight: 500;
+      box-shadow: inset 0 1px 4px rgb(209 217 230 / 0.3);
+      font-family: 'Times New Roman', Times, serif;
+      user-select: text;
+    }
+    input[type="text"]:focus {
+      border-color: #3b82f6;
+      box-shadow: 0 0 10px rgba(59,130,246,0.3);
+      outline-color: #3b82f6;
+    }
+
+    button {
+      cursor: pointer;
+      font-weight: 700;
+      font-size: 1rem;
+      padding: 0.7rem 0;
+      background: linear-gradient(90deg, #3b82f6 0%, #2563eb 100%);
+      border: none;
+      border-radius: 28px;
+      color: white;
+      box-shadow: 0 6px 16px rgba(37, 99, 235, 0.35);
+      transition: background 0.3s ease, transform 0.15s ease, box-shadow 0.3s ease;
+      user-select: none;
+      width: 100%;
+      letter-spacing: 0.05em;
+      font-family: 'Times New Roman', Times, serif;
+    }
+    button:hover {
+      background: linear-gradient(90deg, #2563eb 0%, #3b82f6 100%);
+      transform: translateY(-1.5px);
+      box-shadow: 0 10px 24px rgba(37, 99, 235, 0.5);
+    }
+    button:active {
+      transform: translateY(0);
+      box-shadow: 0 4px 10px rgba(37, 99, 235, 0.25);
+    }
+
+    pre#output {
+      margin-top: 1rem;
+      background: #f0f4ff;
+      color: #1e293b;
+      font-family: 'Times New Roman', Times, serif;
+      font-size: 0.9rem;
+      border-radius: 10px;
+      padding: 1rem 1.2rem;
+      box-shadow: inset 0 0 12px rgb(59 130 246 / 0.15);
+      white-space: pre-wrap;
+      min-height: 110px;
+      line-height: 1.4;
+      position: relative;
+      user-select: text;
+    }
+
+    a#mapsLink {
+      margin-top: 1rem;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.4rem;
+      padding: 0.5rem 1.3rem;
+      border-radius: 28px;
+      font-weight: 600;
+      font-size: 0.95rem;
+      color: white;
+      background: #2563eb;
+      text-decoration: none;
+      box-shadow: 0 6px 16px rgba(37, 99, 235, 0.35);
+      transition: background 0.3s ease, box-shadow 0.3s ease;
+      user-select: none;
+      font-family: 'Times New Roman', Times, serif;
+    }
+    a#mapsLink:hover {
+      background: #1e40af;
+      box-shadow: 0 12px 24px rgba(30, 64, 175, 0.6);
+    }
+    a#mapsLink svg {
+      width: 16px;
+      height: 16px;
+      fill: white;
+    }
+
+    .status {
+      font-weight: 600;
+      font-size: 0.9rem;
+      color: #2563eb;
+      min-height: 1.3rem;
+    }
+    .error {
+      color: #dc2626;
+    }
+
+    /* Responsive */
+    @media (max-width: 480px) {
+      .card {
+        max-width: 100%;
+        padding: 1.2rem 1rem 1.8rem;
+        margin: 0 0.5rem;
+      }
+      h1 {
+        font-size: 1.5rem;
+      }
+      input[type="text"], button {
+        font-size: 0.95rem;
+        padding: 0.6rem 1rem;
+      }
+      a#mapsLink {
+        font-size: 0.9rem;
+        padding: 0.45rem 1.1rem;
+      }
+      pre#output {
+        font-size: 0.85rem;
+        min-height: 90px;
+      }
+    }
+
+  </style>
+</head>
+<body>
+  <main class="card" role="main" aria-label="IP Geolocation lookup tool">
+    <h1>IP Geo Locator</h1>
+    <input
+      id="ipInput"
+      type="text"
+      placeholder="Enter IP address, e.g. 8.8.8.8"
+      aria-describedby="statusMessage"
+      autocomplete="off"
+      autofocus
+      aria-required="true"
+      spellcheck="false"
+    />
+    <button type="button" onclick="lookupIP()" aria-label="Lookup IP location">Lookup</button>
+
+    <pre id="output" aria-live="polite" aria-atomic="true"></pre>
+  </main>
+
+  <script>
+    async function lookupIP() {
+      const ipInput = document.getElementById('ipInput');
+      const output = document.getElementById('output');
+      const ip = ipInput.value.trim();
+
+      output.classList.remove('error');
+      output.style.color = '#2563eb';
+      output.textContent = '';
+
+      if (!ip) {
+        output.textContent = '⚠️ Please enter an IP address.';
+        output.classList.add('error');
+        return;
+      }
+
+      output.textContent = '⏳ Looking up location...';
+
+      try {
+        const response = await fetch(`http://ip-api.com/json/${ip}`);
+        const data = await response.json();
+
+        if (data.status === 'success') {
+          const mapsUrl = `https://www.google.com/maps?q=${data.lat},${data.lon}`;
+
+          output.classList.remove('error');
+          output.style.color = '#1e293b';
+          output.innerHTML = `
+IP: ${data.query}
+Country: ${data.country}
+Region: ${data.regionName}
+City: ${data.city}
+ZIP: ${data.zip}
+Latitude: ${data.lat}
+Longitude: ${data.lon}
+ISP: ${data.isp}
+
+<a id="mapsLink" href="${mapsUrl}" target="_blank" rel="noopener noreferrer" aria-label="Open location on Google Maps">
+  View on Google Maps
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 1l4 4-7 7-4-4 7-7z"/><path d="M3 21v-4l11-11 4 4-11 11z"/></svg>
+</a>
+          `;
+        } else {
+          output.classList.add('error');
+          output.style.color = '#dc2626';
+          output.textContent = `❌ Error: ${data.message}`;
+        }
+      } catch (error) {
+        output.classList.add('error');
+        output.style.color = '#dc2626';
+        output.textContent = '❌ Failed to fetch location info. Please check your connection.';
+      }
+    }
+  </script>
+</body>
+</html>
